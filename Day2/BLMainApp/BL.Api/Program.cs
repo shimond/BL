@@ -1,15 +1,17 @@
 using BL.Api.Contracts;
+using BL.Api.DataContext;
 using BL.Api.Routes;
 using BL.Api.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IProductRepository, ProductRepository>();
-
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddDbContext<MyDbContext>(x => x.UseInMemoryDatabase("BL"));
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -11,8 +11,15 @@ public static class ProductsRoutes
 
         productsGroup.MapGet("", GetAllProducts);
         productsGroup.MapGet("{id}", GetById);
+        productsGroup.MapPost("", AddNewProduct);
 
         return app;
+    }
+
+    private static async Task<Created<Product>> AddNewProduct(Product p, IProductRepository productRepository)
+    {
+        var added = await productRepository.AddNewProduct(p);
+        return TypedResults.Created($"/api/products/{added.Id}", added);
     }
 
     static async Task<Results<NotFound, Ok<Product>>> GetById(int id, string? fieldOrder, IProductRepository repository)
@@ -25,7 +32,7 @@ public static class ProductsRoutes
         return TypedResults.Ok(result);
     }
 
-    static async Task<Ok<List<Product>>> GetAllProducts(IProductRepository repository)
+    static async Task<Ok<List<Product>>> GetAllProducts(sIProductRepository repository)
     {
         var result = await repository.GetProductsAsync();
         return TypedResults.Ok(result);

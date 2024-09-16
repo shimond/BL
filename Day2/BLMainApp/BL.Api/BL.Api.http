@@ -1,6 +1,20 @@
-@BL.Api_HostAddress = http://localhost:5231
+@BL.Api_HostAddress = https://localhost:7034
 
-GET {{BL.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+
+GET {{BL.Api_HostAddress}}/api/products/
+
 
 ###
+
+GET https://github.com
+
+###
+
+POST {{BL.Api_HostAddress}}/api/products/
+Content-Type: application/json
+
+{
+    "name": "Bamba",
+    "description": "WOW"
+}
+
