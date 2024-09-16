@@ -1,6 +1,9 @@
 using BL.Api.Contracts;
+using BL.Api.Routes;
 using BL.Api.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -11,26 +14,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
-var productsGroup = app.MapGroup("api/products")
-    .WithTags("Products");
-
-productsGroup.MapGet("", async (IProductRepository repository) =>
-{
-    var result = await repository.GetProductsAsync();
-    return result;
-});
-
-
-productsGroup.MapGet("{id}", async Task<IResult>(int id, string? fieldOrder, IProductRepository repository) =>
-{
-    var result = await repository.GetProductById(id);
-    if(result == null)
-    {
-        return Results.NotFound();
-    }
-    return Results.Ok(result);
-});
+app.MapProductsRoutes();
 
 app.Run();
 
