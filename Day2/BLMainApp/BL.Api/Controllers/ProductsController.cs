@@ -1,4 +1,5 @@
 using BL.Api.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Options;
@@ -7,24 +8,19 @@ namespace BL.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    //[Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly RedisConfig redisConfig;
         private readonly IProductRepository productRepository;
 
         public ProductsController(
-            //[FromKeyedServices("Mock")]
-            //IProductRepository productRepository,
-            IOptionsMonitor<RedisConfig> redisConfigOptions,
+            IProductRepository  productRepository,
+            IOptions<RedisConfig> redisConfigOptions,
             IServiceProvider serviceProvider)
         {
-            redisConfig = redisConfigOptions.CurrentValue;
-            redisConfigOptions.OnChange((redisConf, val) => {
-                //this.redisConfig = redisConf;
-            });
-            redisConfig = redisConfigOptions.CurrentValue;
+            redisConfig = redisConfigOptions.Value;
             this.productRepository = productRepository;
-
             serviceProvider.GetKeyedService<IProductRepository>("Mock");
         }
 
@@ -34,15 +30,14 @@ namespace BL.Api.Controllers
             return Ok(redisConfig);
         }
 
-
-
         [HttpGet]
         [ProducesResponseType<List<Product>>(200)]
         [ProducesResponseType(400)]
+        //[Authorize(policy:"Manager")]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
             var products = await productRepository.GetProductsAsync();
-            return Ok(products);
+            return Ok("asD");
         }
 
         [HttpGet("GetTime")]

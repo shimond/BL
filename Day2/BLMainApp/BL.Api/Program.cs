@@ -1,39 +1,36 @@
 using BL.Api.Contracts;
 using BL.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.Configure<RedisConfig>(builder.Configuration.GetSection("RedisConfig"));
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOutputCache();
-//builder.Services.AddTransient<IProductRepository, ProductRepository>();
-
-builder.Services.AddKeyedScoped<IProductRepository, ProductRepositoryMock>("Mock");
-builder.Services.AddKeyedScoped<IProductRepository, ProductRepository>("Real");
-
-builder.Services.AddCors(x=> x.AddDefaultPolicy(o=> o.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
-app.UseOutputCache();
-app.UseCors();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-if (app.Environment.IsDevelopment())
+
+var productsGroup = app.MapGroup("api/products")
+    .WithTags("Products");
+
+productsGroup.MapGet("", async (IProductRepository repository) =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var result = await repository.GetProductsAsync();
+    return result;
+});
 
-//app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
-app.MapGet("test", (IConfiguration configuration) => configuration["blValue:value"]);
-
-app.MapGet("getValueFromConfig", (IConfiguration configuration) => configuration["BasicTimeOut"]);
-
-app.MapControllers();
+productsGroup.MapGet("{id}", async Task<IResult>(int id, string? fieldOrder, IProductRepository repository) =>
+{
+    var result = await repository.GetProductById(id);
+    if(result == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(result);
+});
 
 app.Run();
 
