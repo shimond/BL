@@ -2,11 +2,17 @@ using BL.Api.Contracts;
 using BL.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<RedisConfig>(builder.Configuration.GetSection("RedisConfig"));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOutputCache();
-builder.Services.AddTransient<IProductRepository, ProductRepository>();
+//builder.Services.AddTransient<IProductRepository, ProductRepository>();
+
+builder.Services.AddKeyedScoped<IProductRepository, ProductRepositoryMock>("Mock");
+builder.Services.AddKeyedScoped<IProductRepository, ProductRepository>("Real");
+
 builder.Services.AddCors(x=> x.AddDefaultPolicy(o=> o.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
