@@ -25,6 +25,8 @@ app.UseAuthorization();
 
 app.MapGet("test", (IConfiguration configuration) => configuration["blValue:value"]);
 
+app.MapGet("getValueFromConfig", (IConfiguration configuration) => configuration["BasicTimeOut"]);
+
 app.MapControllers();
 
 app.Run();
@@ -56,12 +58,12 @@ app.Run();
 
 
 
-class TaskRunner
-{
-    void Run(Action action)
-    {
-        Task.Factory.StartNew(action)
-            .ContinueWith(x=> Console.WriteLine(x.Exception),  
-            TaskContinuationOptions.OnlyOnFaulted);
-    }
-}
+//class TaskRunner
+//{
+//    void Run(Action action)
+//    {
+//        Task.Factory.StartNew(action)
+//            .ContinueWith(x=> Console.WriteLine(x.Exception),  
+//            TaskContinuationOptions.OnlyOnFaulted);
+//    }
+//}
