@@ -1,5 +1,3 @@
-using API.Extensions;
-using API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,4 +13,5 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
+app.MapCarsApis();
 app.Run();
