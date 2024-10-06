@@ -10,6 +10,27 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddHeathCheck(this IServiceCollection services)
+    {
+
+        services.AddHealthChecks()
+              .AddDiskStorageHealthCheck(x =>
+              {
+                  x.AddDrive(@"C:\", minimumFreeMegabytes: 1100000);
+                  x.CheckAllDrives = true;
+              }, "Disk storage");
+
+
+
+        services.AddHealthChecksUI(options =>
+        {
+            options.SetEvaluationTimeInSeconds(15);
+            options.MaximumHistoryEntriesPerEndpoint(60);
+            options.AddHealthCheckEndpoint("Garage Management API", "/health");
+        }).AddInMemoryStorage();
+        return services;
+    }
+
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddEndpointsApiExplorer();

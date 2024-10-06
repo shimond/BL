@@ -5,6 +5,7 @@ builder.Services
     .AddSwagger()
     .AddInfrastructureServices(builder.Configuration)
     .AddMappingServices()
+    .AddHeathCheck()
     .AddApplicationServices();
 
 
