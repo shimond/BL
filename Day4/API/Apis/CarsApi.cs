@@ -10,13 +10,24 @@ public static class CarsApi
 {
     public static void MapCarsApis(this IEndpointRouteBuilder app)
     {
-        var carsApi = app.MapGroup("cars");
+        var carsApi = app.MapGroup("v{version:apiVersion}/cars")
+            .MapToApiVersion(1.0)
+            .MapToApiVersion(2.0);
+
 
         carsApi.MapGet("", async Task<Ok<List<CarDto>>> (IGarageService service, [AsParameters] PaginationRequest pagination) =>
         {
             var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
             return TypedResults.Ok(result);
         });
+
+        carsApi.MapGet("", async Task<Ok<List<CarDto>>> (IGarageService service, [AsParameters] PaginationRequest pagination) =>
+        {
+            var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
+            return TypedResults.Ok(new List<CarDto> { new CarDto { Id = 1, Make = "make", Model = "model", Year = 1999 } });
+        }).MapToApiVersion(3.0);
+
+
 
         carsApi.MapGet("{id}", async Task<Results<Ok<CarDto>, NotFound>> (IGarageService service, int id) =>
         {

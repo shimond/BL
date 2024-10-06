@@ -2,7 +2,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+    .AddVersioning()
     .AddSwagger()
+    .AddExceptionHandling()
     .AddInfrastructureServices(builder.Configuration)
     .AddMappingServices()
     .AddHeathCheck()
@@ -10,9 +12,9 @@ builder.Services
 
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
-app.UseHttpsRedirection();
 
-app.MapCarsApis();
+app
+    .MapApis()
+    .MapSwagger()
+    .UseHttpsRedirection();
 app.Run();

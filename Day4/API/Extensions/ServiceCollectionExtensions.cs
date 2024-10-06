@@ -1,5 +1,4 @@
-﻿using API.Mapping;
-
+﻿
 namespace API.Extensions;
 
 public static class ServiceCollectionExtensions
@@ -7,6 +6,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IGarageService, GarageService>();
+        return services;
+    }
+
+    public static IServiceCollection AddExceptionHandling(this IServiceCollection services)
+    {
+        services.AddProblemDetails();
+        services.AddExceptionHandler<ItemResultExceptionHandler>();
         return services;
     }
 
@@ -38,9 +44,33 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddVersioning(this IServiceCollection services)
+    {
+        services.ConfigureOptions<ConfigureSwaggerOptions>();
+
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = new UrlSegmentApiVersionReader();
+        }).AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+
+        return services;
+    }
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.ResolveConflictingActions(apiDescriptions =>
+            {
+                return apiDescriptions.First();
+            });
+        });
         return services;
     }
 
@@ -49,6 +79,5 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(typeof(GarageProfile));
         return services;
     }
-
 
 }
