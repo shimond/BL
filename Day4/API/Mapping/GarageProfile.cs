@@ -1,6 +1,4 @@
-﻿
-namespace API.Mapping;
-
+﻿namespace API.Mapping;
 public class GarageProfile : Profile
 {
     public GarageProfile()
