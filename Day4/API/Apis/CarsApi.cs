@@ -10,26 +10,23 @@ public static class CarsApi
 {
     public static void MapCarsApis(this IEndpointRouteBuilder app)
     {
-        var carsApi = app.MapGroup("v{version:apiVersion}/cars")
-            .MapToApiVersion(1.0)
-            .MapToApiVersion(2.0);
+        var carsApi = app.MapGroup("cars");
 
 
         carsApi.MapGet("", async Task<Ok<List<CarDto>>> (IGarageService service, [AsParameters] PaginationRequest pagination) =>
         {
             var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
             return TypedResults.Ok(result);
-        });
+        }).MapToApiVersion(1.0);
 
         carsApi.MapGet("", async Task<Ok<List<CarDto>>> (IGarageService service, [AsParameters] PaginationRequest pagination) =>
         {
             var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
-            return TypedResults.Ok(new List<CarDto> { new CarDto { Id = 1, Make = "make", Model = "model", Year = 1999 } });
+            return TypedResults.Ok(new List<CarDto> { new CarDto { Id = 1, Brand = "Opel", Model = "model", Year = 1999 } });
         }).MapToApiVersion(3.0);
 
 
-
-        carsApi.MapGet("{id}", async Task<Results<Ok<CarDto>, NotFound>> (IGarageService service, int id) =>
+         carsApi.MapGet("{id}", async Task<Results<Ok<CarDto>, NotFound>> (IGarageService service, int id) =>
         {
             var car = await service.GetCarByIdAsync(id);
             return car != null ? TypedResults.Ok(car) : TypedResults.NotFound();
@@ -62,10 +59,25 @@ public static class CarsApi
         });
 
 
+
         carsApi.MapDelete("{id}", async (IGarageService service, int id) =>
         {
             await service.DeleteCarAsync(id);
             return TypedResults.NoContent();
+        });
+
+        carsApi.MapPost("{carId}/carServices", async Task<Results<BadRequest<List<ValidationResult>>, Created<CarServiceDto>>> (IGarageService service, int carId, CreateCarServiceDto treatmentDto) =>
+        {
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(treatmentDto);
+            if (!Validator.TryValidateObject(treatmentDto, validationContext, validationResults, true))
+            {
+                return TypedResults.BadRequest(validationResults);
+            }
+
+            var createdTreatment = await service.AddCarServiceAsync(carId, treatmentDto);
+            return TypedResults.Created($"/v2/cars/{carId}/carServices/{createdTreatment.Id}", createdTreatment);
+                
         });
     }
 }

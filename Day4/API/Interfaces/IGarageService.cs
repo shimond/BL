@@ -10,4 +10,5 @@ public interface IGarageService
     Task<CarDto> UpdateCarAsync(int id, UpdateCarDto carDto);
     Task<CarDto> UpdateCarYearAsync(int id, int year);
     Task  DeleteCarAsync(int id);
+    Task<CarServiceDto> AddCarServiceAsync(int carId, CreateCarServiceDto serviceDto);
 }

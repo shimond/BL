@@ -1,14 +1,17 @@
 ﻿
+using Microsoft.AspNetCore.Cors.Infrastructure;
+
 namespace API.Services;
 
 public class GarageService(GarageContext context, IMapper mapper) : IGarageService
 {
-
     public async Task<List<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
     {
         return await context.Cars
+            .Include(x=>x.CarServices)
+            .AsSplitQuery()
             .OrderBy(c => c.Id)
-            .Skip((pageNumber - 1) * pageSize)
+            .Skip(pageNumber * pageSize)
             .Take(pageSize)
             .Select(c => mapper.Map<CarDto>(c))
             .ToListAsync();
@@ -22,7 +25,7 @@ public class GarageService(GarageContext context, IMapper mapper) : IGarageServi
 
     public async Task<CarDto> AddCarAsync(CreateCarDto carDto)
     {
-        var car = mapper.Map<Car>(carDto);
+        var car = mapper.Map<CarEntity>(carDto);
         context.Cars.Add(car);
         await context.SaveChangesAsync();
         return mapper.Map<CarDto>(car);
@@ -54,5 +57,11 @@ public class GarageService(GarageContext context, IMapper mapper) : IGarageServi
         return mapper.Map<CarDto>(item);
     }
 
- 
+    public async Task<CarServiceDto> AddCarServiceAsync(int carId, CreateCarServiceDto serviceDto)
+    {
+        var carService = mapper.Map<CarServiceEntity>(serviceDto) with { CarId = carId };
+        context.CarServices.Add(carService);
+        await context.SaveChangesAsync();
+        return  mapper.Map<CarServiceDto>(carService);
+    }
 }

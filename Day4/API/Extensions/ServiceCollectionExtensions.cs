@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddEndpointsApiExplorer();
-        services.AddDbContext<GarageContext>(options => options.UseInMemoryDatabase("Cars"));
+        services.AddDbContext<GarageContext>(options => options.UseSqlServer(configuration["ConnectionStrings:Cars"]));
         return services;
     }
 

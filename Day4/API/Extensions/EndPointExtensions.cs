@@ -19,7 +19,7 @@ public static class EndPointExtensions
     public static WebApplication MapApis(this WebApplication app)
     {
         var apiVersionSet = app.GetVersionSet();
-        app.MapGroup("")
+        app.MapGroup("v{version:apiVersion}")
             .WithApiVersionSet(apiVersionSet)
             .MapCarsApis();
         return app;
