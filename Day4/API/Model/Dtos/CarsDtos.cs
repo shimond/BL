@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using API.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace API.Model.Dtos;
 
-public record CreateCarDto
+public record CreateCarDto : IBackendValidation
 {
     [Required]
     public string Brand { get; set; }
@@ -12,16 +13,20 @@ public record CreateCarDto
     public int Year { get; set; }
 }
 
-public record UpdateCarDto
+public record UpdateCarDto : IBackendValidation
 {
+    [Required]
     public string Brand { get; set; }
+    [Required]
     public string Model { get; set; }
+    [Range(1886, 2100)]
     public int Year { get; set; }
 }
 
 
-public record UpdateCarYearDto
+public record UpdateCarYearDto : IBackendValidation
 {
+    [Range(1886, 2100)]
     public int NewYear { get; set; }
 }
 
@@ -42,7 +47,7 @@ public record CarServiceDto
     public DateTime Date { get; set; }
 }
 
-public record CreateCarServiceDto
+public record CreateCarServiceDto : IBackendValidation
 {
     [Required]
     public string Description { get; set; } = "";

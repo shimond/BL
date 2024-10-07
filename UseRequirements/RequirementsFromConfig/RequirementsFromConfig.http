@@ -1,0 +1,6 @@
+@RequirementsFromConfig_HostAddress = http://localhost:5197
+
+GET {{RequirementsFromConfig_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

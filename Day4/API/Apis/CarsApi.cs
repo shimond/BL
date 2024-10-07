@@ -1,6 +1,5 @@
-﻿
-using API.Interfaces;
-using API.Model.Dtos;
+﻿using API.EndpointFilters;
+using API.Validation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,11 +9,16 @@ public static class CarsApi
 {
     public static void MapCarsApis(this IEndpointRouteBuilder app)
     {
-        var carsApi = app.MapGroup("cars");
+        var carsApi = app.MapGroup("cars").AddEndpointFilter<ValidationEndpointFilter>();
 
 
-        carsApi.MapGet("", async Task<Ok<List<CarDto>>> (IGarageService service, [AsParameters] PaginationRequest pagination) =>
+        carsApi.MapGet("", async Task<Ok<List<CarDto>>> (
+            IServiceProvider services,
+            IGarageService service, [AsParameters] PaginationRequest pagination) =>
         {
+            //var d1 = services.GetRequiredKeyedService<DbContext>("us");
+            //var d2 = services.GetRequiredKeyedService<DbContext>("eu");
+
             var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
             return TypedResults.Ok(result);
         }).MapToApiVersion(1.0);
@@ -26,20 +30,14 @@ public static class CarsApi
         }).MapToApiVersion(3.0);
 
 
-         carsApi.MapGet("{id}", async Task<Results<Ok<CarDto>, NotFound>> (IGarageService service, int id) =>
-        {
-            var car = await service.GetCarByIdAsync(id);
-            return car != null ? TypedResults.Ok(car) : TypedResults.NotFound();
-        });
+        carsApi.MapGet("{id}", async Task<Results<Ok<CarDto>, NotFound>> (IGarageService service, int id) =>
+       {
+           var car = await service.GetCarByIdAsync(id);
+           return car != null ? TypedResults.Ok(car) : TypedResults.NotFound();
+       });
 
         carsApi.MapPost("", async Task<Results<BadRequest<List<ValidationResult>>, Created<CarDto>>> (IGarageService service, CreateCarDto carDto) =>
         {
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(carDto);
-            if (!Validator.TryValidateObject(carDto, validationContext, validationResults, true))
-            {
-                return TypedResults.BadRequest(validationResults);
-            }
 
             var createdCar = await service.AddCarAsync(carDto);
             return TypedResults.Created($"/cars/{createdCar.Id}", createdCar);
@@ -59,7 +57,6 @@ public static class CarsApi
         });
 
 
-
         carsApi.MapDelete("{id}", async (IGarageService service, int id) =>
         {
             await service.DeleteCarAsync(id);
@@ -77,7 +74,7 @@ public static class CarsApi
 
             var createdTreatment = await service.AddCarServiceAsync(carId, treatmentDto);
             return TypedResults.Created($"/v2/cars/{carId}/carServices/{createdTreatment.Id}", createdTreatment);
-                
+
         });
     }
 }
