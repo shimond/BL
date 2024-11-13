@@ -1,20 +1,25 @@
 ﻿
+using API.Model;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace API.Services;
 
 public class GarageService(GarageContext context, IMapper mapper) : IGarageService
 {
-    public async Task<List<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
+    public async Task<PagedResult<CarDto>> GetCarsAsync(int pageNumber, int pageSize)
     {
-        return await context.Cars
-            .Include(x=>x.CarServices)
+        var totalItems = await context.Cars.CountAsync();
+
+        var cars = await context.Cars
+            .Include(x => x.CarServices)
             .AsSplitQuery()
             .OrderBy(c => c.Id)
             .Skip(pageNumber * pageSize)
             .Take(pageSize)
             .Select(c => mapper.Map<CarDto>(c))
             .ToListAsync();
+
+        return new PagedResult<CarDto>(cars, totalItems);
     }
 
     public async Task<CarDto?> GetCarByIdAsync(int id)

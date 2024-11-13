@@ -1,13 +1,19 @@
+using API.Validation;
+using FluentValidation;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+     .AddValidatorsFromAssemblyContaining<CreateCarDtoValidator>()
     .AddVersioning()
     .AddSwagger()
     .AddExceptionHandling()
     .AddInfrastructureServices(builder.Configuration)
     .AddMappingServices()
     .AddHeathCheck()
+
+
     .AddApplicationServices();
 
 

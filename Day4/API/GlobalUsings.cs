@@ -16,4 +16,7 @@ global using API.OpenAPI;
 global using Asp.Versioning;
 global using Asp.Versioning.Builder;
 global using Asp.Versioning.Conventions;
+global using API.EndpointFilters;
+global using Microsoft.AspNetCore.Http.HttpResults;
+global using System.ComponentModel.DataAnnotations;
 

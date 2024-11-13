@@ -1,0 +1,24 @@
+[
+  {
+    "Name": "run-local-all",
+    "Projects": [
+      {
+        "Path": "Services\\PatientMonitoringService\\PatientMonitoringService.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "PatientHistoryService\\PatientHistoryService.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Bffs\\WebClientBffGateway\\WebClientBffGateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Services\\PateintDataAPI\\PatientDataAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

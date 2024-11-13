@@ -1,7 +1,4 @@
-﻿using API.EndpointFilters;
-using API.Validation;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.ComponentModel.DataAnnotations;
+﻿using API.Model;
 
 namespace API.Apis;
 
@@ -12,13 +9,10 @@ public static class CarsApi
         var carsApi = app.MapGroup("cars").AddEndpointFilter<ValidationEndpointFilter>();
 
 
-        carsApi.MapGet("", async Task<Ok<List<CarDto>>> (
+        carsApi.MapGet("", async Task<Ok<PagedResult<CarDto>>> (
             IServiceProvider services,
             IGarageService service, [AsParameters] PaginationRequest pagination) =>
         {
-            //var d1 = services.GetRequiredKeyedService<DbContext>("us");
-            //var d2 = services.GetRequiredKeyedService<DbContext>("eu");
-
             var result = await service.GetCarsAsync(pagination.PageIndex, pagination.PageSize);
             return TypedResults.Ok(result);
         }).MapToApiVersion(1.0);
